@@ -1,4 +1,5 @@
 import numpy as np
+from collections import Counter
 
 
 def euc_distance(x1, x2):
@@ -18,20 +19,14 @@ class KNN:
         return predictions
 
     def _predict(self, x):
-        # calc euclidian distance
+        # calculate distances
         distances = [euc_distance(x, x_train) for x_train in self.X_train]
 
-        # sort
-        idx_k_closest = np.argsort(distances)[0 : self.k]
+        # sort and take k nearsest sample
+        k_idx = np.argsort(distances)[0 : self.k]
 
         # vote
-        hashmap = {}  # key: label, val: count of label
-        for idx in idx_k_closest:
-            hashmap[self.y_train[idx]] = 1 + hashmap.get(self.y_train[idx], 0)
+        counts = Counter(self.y[k_idx])
+        most_common = counts.most_common(1)[0][0]
 
-        key_list = list(hashmap.keys())
-        val_list = list(hashmap.values())
-
-        most_common_label = key_list[val_list.index(max(val_list))]
-
-        return most_common_label
+        return most_common
